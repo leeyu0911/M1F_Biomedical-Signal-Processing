@@ -1,4 +1,4 @@
-function b =  wiener_hopf(x,y,maxlags) 
+function b = wiener_hopf(x,y,maxlags) 
 %  Function to compute LMS algol using Weiner-Hopf equations 
 %   I nputs: x =  input 
 %            y =  desired signal 
