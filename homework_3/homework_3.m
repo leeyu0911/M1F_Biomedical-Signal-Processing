@@ -11,7 +11,7 @@ x = (1:segments) / fs;
 y = ecg(1:segments);
 y_ = y / max(y);
 
-figure
+figure % 1
 subplot(3, 1, 1);  % 原始ECG
 plot(x, y_)
 axis tight;
@@ -44,18 +44,23 @@ bb = wiener_hopf(y', b, n); % Apply Weiner Hopf Equations
 y_wiener = filter(bb, 1, y); %  Filter data using optimum filter weights 
 y_wiener = y_wiener / max(y_wiener);
 
-plot(x, y_wiener, 'r'); %  Plot filtered data 
+plot(x, y_wiener, 'Color', [0.8500 0.3250 0.0980]); %  Plot filtered data 
 xlabel('Time(sec)'); 
 ylabel('y(t)'); 
 axis tight
 title('After Optimal Filtering');
 
-figure
+figure % 2
 % subplot(211)
 [y_p1, x_p1] = periodogram(y,rectwin(length(y)),length(y),fs);
 % subplot(212)
 [y_p2, x_p2] = periodogram(y_wiener,rectwin(length(y_wiener)),length(y_wiener),fs);
 plot(x_p1, 10*log10(y_p1), x_p2, 10*log10(y_p2))
+xline(60,'-.r');
+xline(180,'-.r');
+xline(300,'-.r');
+xline(420,'-.r');
+yline(-50, '--r');
 xlabel('Hz')
 title('ECG signal PSD')
 legend('Original', 'Wiener filter')
@@ -68,7 +73,7 @@ segments = 765;
 x = (1:segments) / fs;
 y = ecg(1:segments);
 
-figure
+figure % 3
 subplot(2, 1, 1);
 plot(x, y)
 axis tight;
@@ -154,9 +159,9 @@ f=(0:((nfft/2)-1))*fs/nfft;
 h_comb=[0.631 -0.2149 0.1512 -0.1288 0.1227 -0.1288 0.1512 -0.2149 0.6310]; 
 comb=conv(ecg(1:nfft), h_comb); 
 
-figure 
-subplot(311) 
-plot((1:nfft)/fs,comb(1:nfft)) 
+figure % 4
+subplot(211) 
+plot((1:nfft)/fs,comb(1:nfft), 'color', [0.4660 0.6740 0.1880]) 
 axis tight; 
 xlabel('Time in seconds'); 
 title('Low-passed ECG after Comb'); 
@@ -164,7 +169,7 @@ axis tight
 grid; 
 
 %
-subplot(312) 
+subplot(212) 
 % Y_comb=fft(comb(1:nfft),nfft); 
 % PS_comb=abs(Y_comb).^2; 
 % PS_comb=PS_comb/PS_comb(1); 
@@ -177,30 +182,20 @@ x = (1:segments) / fs;
 y = ecg(1:segments);
 % periodogram(y,rectwin(length(y)),length(y),fs)
 
-periodogram(y_wiener,rectwin(length(y_wiener)),length(y_wiener),fs);
-xline(60,'-.r');
-xline(180,'-.r');
-xline(300,'-.r');
-xline(420,'-.r');
-yline(-50, '--r');
+% periodogram(y_wiener,rectwin(length(y_wiener)),length(y_wiener),fs);
+[y_o, x_o] = periodogram(ecg(1:nfft),rectwin(length(ecg(1:nfft))),length(ecg(1:nfft)),fs);
+% xline(60,'-.r');
+% xline(180,'-.r');
+% xline(300,'-.r');
+% xline(420,'-.r');
+% yline(-50, '--r');
 
 
-subplot(313)
-periodogram(comb(1:nfft),rectwin(length(comb(1:nfft))),length(comb(1:nfft)),fs)
-xline(60,'-.r');
-xline(180,'-.r');
-xline(300,'-.r');
-xline(420,'-.r');
-yline(-50, '--r');
-
-%% Compare the results with the results of the lowpass filter.
-
-figure
-[y_w, x_w] = periodogram(y_wiener,rectwin(length(y_wiener)),length(y_wiener),fs);
+% subplot(313)
 [y_c, x_c] = periodogram(comb(1:nfft),rectwin(length(comb(1:nfft))),length(comb(1:nfft)),fs);
-p1 = plot(x_w, 10*log10(y_w));
+p_o = plot(x_o, 10*log10(y_o));
 hold on
-p2 = plot(x_c, 10*log10(y_c));
+p_c = plot(x_c, 10*log10(y_c), 'color', [0.4660 0.6740 0.1880]);
 xline(60,'-.r');
 xline(180,'-.r');
 xline(300,'-.r');
@@ -208,4 +203,22 @@ xline(420,'-.r');
 yline(-50, '--r');
 xlabel('Hz')
 title('PSD')
-legend([p1, p2], {'wiener', 'comb'})
+legend([p_o, p_c], {'Orginal', 'Comb'})
+
+
+%% Compare the results with the results of the lowpass filter.
+
+figure % 5
+[y_w, x_w] = periodogram(y_wiener,rectwin(length(y_wiener)),length(y_wiener),fs);
+[y_c, x_c] = periodogram(comb(1:nfft),rectwin(length(comb(1:nfft))),length(comb(1:nfft)),fs);
+p1 = plot(x_w, 10*log10(y_w), 'Color', [0.8500 0.3250 0.0980]);
+hold on
+p2 = plot(x_c, 10*log10(y_c), 'color', [0.4660 0.6740 0.1880]);
+xline(60,'-.r');
+xline(180,'-.r');
+xline(300,'-.r');
+xline(420,'-.r');
+yline(-50, '--r');
+xlabel('Hz')
+title('PSD')
+legend([p1, p2], {'Wiener', 'comb'})
