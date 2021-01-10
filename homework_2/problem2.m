@@ -11,20 +11,20 @@ n = 8000;
 h = 0.5 * [1, 0, -1];
 y=conv(ecg, h);
 
-figure
+figure %1
 plot((1:n) / fs, ecg(1:n)) 
 title('ECG with low-frequency noise')
 xlabel('Time in seconds'); 
 ylabel('Original ECG');
 
-figure
+figure %2
 plot((1:n) / fs, y(1:n)) 
 axis([1 8 -0.5 0.5]);
 title('Apply three-point central-difference operator to the ECG')
 xlabel('Time in seconds'); 
 ylabel('Filtered ECG');
 
-figure
+figure %3
 periodogram(ecg,rectwin(length(ecg)),length(ecg),fs)
 
 %% Calculate the noise levels of ECGs before and after filtering.
@@ -42,7 +42,7 @@ Y = fft(ecg(segments), nfft);
 PS = abs(Y).^2;
 PS = PS / max(PS);
 
-figure
+figure %4
 subplot(2, 1, 1)
 plot(f, 10*log10(PS(1:((nfft / 2)))));
 xlabel('Frequency in Hz'); 
@@ -60,8 +60,19 @@ xlabel('Frequency in Hz');
 ylabel('dB'); 
 title('Noise levels of filtering')
 
-figure
+figure %5
 periodogram(y,rectwin(length(y)),length(y),fs)
+
+figure %6
+Y = fft(y, nfft);
+PS = abs(Y).^2;
+PS = PS / max(PS);
+
+plot(f, 10*log10(PS(1:((nfft / 2)))));
+xlabel('Frequency in Hz'); 
+ylabel('dB'); 
+title('Noise levels of filtering')
+ylim([-400 0])
 
 %% Calculate bpm of the ECG signal
 
@@ -92,7 +103,7 @@ for ii = 2:length(index)
 end
 
 one_persec = (sec / (length(index)-1)) / 1000; % 每次幾秒
-(1 / one_persec) * 60; % 每分鐘幾次
+(1 / one_persec) * 60 % 每分鐘幾次
 
     
 
